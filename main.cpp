@@ -39,9 +39,9 @@ int main(int argc, char *argv[]) {
 
     altspam.threshold = a.get<float>("threshold");
     if (a.exist("verbose")) {
+        cout << "BSD-4 License" << endl << "Copyright (c) 2022, devim" << endl << "All rights reserved." << endl;
         cout << "Setting service into debug mode" << endl;
         cout << "--- AltSpam " << SW_VERSION << " ---" << endl;
-        cout << "BSD-4 License" << endl << "Copyright (c) 2022, devim" << endl << "All rights reserved." << endl;
         altspam.debug = true;
         cout << "Threshold set to " << altspam.threshold << endl;
     }
