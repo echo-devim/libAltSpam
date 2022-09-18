@@ -6,7 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include "libAltSpam/AltSpam.h"
+#include "lib/AltSpam.h"
 #include "cmdline.h"
 #include "server.cpp"
 
@@ -34,13 +34,14 @@ int main(int argc, char *argv[]) {
     a.add<string>("is-spam", 'i', "check if an email is spam or not", false, "");
     a.add<string>("spam-score", '\0', "get the spam score for the specified email", false, "");
     a.add("verbose", 'v', "show debug prints");
-    a.add("daemon", 'd', "start background service");
+    a.add("server", '\0', "start API server");
     a.parse_check(argc, argv);
 
     altspam.threshold = a.get<float>("threshold");
     if (a.exist("verbose")) {
         cout << "Setting service into debug mode" << endl;
         cout << "--- AltSpam " << SW_VERSION << " ---" << endl;
+        cout << "BSD-4 License" << endl << "Copyright (c) 2022, devim" << endl << "All rights reserved." << endl;
         altspam.debug = true;
         cout << "Threshold set to " << altspam.threshold << endl;
     }
@@ -67,7 +68,7 @@ int main(int argc, char *argv[]) {
         cout << altspam.loadWordCount(a.get<string>("loadwc")) << endl;
     }
 
-    if (a.exist("daemon")) {
+    if (a.exist("server")) {
         start_server(altspam);
     }
     return 0;
