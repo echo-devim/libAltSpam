@@ -5,7 +5,7 @@ This repository contains the source code of libAltSpam, a lightweight and portab
 The idea of this project is to check if an input email is spam or not assigning it a score. The score is assigned using several checks on the headers, the charsets, url domains and "spam words".
 The library **is not** based on any AI algorithm, because it must be lightweight. You can mark emails as spam in order to add the words of those email to the spam word count database.
 
-Check `https://github.com/echo-devim/AltSpam` for a complete antispam service with graphical user interface based on this library.
+Check [AltSpam Java App](https://github.com/echo-devim/AltSpam) for a complete antispam service with graphical user interface based on this library.
 
 ## Details
 The core of the library is the word count function. Each time you give in input an email marked as spam, the library parses the email and then adds the words in the email to a global word count database called `wc.dat`.
