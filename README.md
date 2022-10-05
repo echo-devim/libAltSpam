@@ -56,7 +56,13 @@ options:
   -r, --remove-from-spam    remove an email from spam dataset (string [=])
   -i, --is-spam             check if an email is spam or not (string [=])
       --spam-score          get the spam score for the specified email (string [=])
+      --list                get the latest n email and print their subject to stdout (int [=5])
+  -m, --monitor             monitor the latest 10 email and move to junk spam emails each n minutes (int [=10])
+      --spam-folder         set spam folder name where to move spam messages (string [=JUNK])
+      --imap-conf           imap configuration file (string [=])
+      --init-imap           interactive imap configuration (string [=prop.ini])
   -v, --verbose             show debug prints
+  -d, --delete              when combined with monitor option, force spam emails deletion
       --server              start API server
   -?, --help                print this message
 ```
@@ -64,6 +70,11 @@ options:
 Example of usage:
 ```sh
 $ ./altspam --server
+```
+
+You can monitor your inbox folder for spam messages each 10 minutes on a remote IMAP server with the following command:
+```sh
+$ ./altspam --imap-conf conn.dat --monitor 10
 ```
 
 ## Compilation
