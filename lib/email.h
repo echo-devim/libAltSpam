@@ -4,6 +4,7 @@
 #include <set>
 #include <sstream>
 #include "link.h"
+#include "../misc/cryptoutil.h"
 
 using namespace std;
 
@@ -13,7 +14,6 @@ private:
     void parse(string email);
     string removeHtmlTags(string &html);
     string removeWhiteSpaces(string text);
-    string decode(string &text);
 
 public:
     string body;

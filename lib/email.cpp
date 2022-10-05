@@ -21,7 +21,7 @@ string Email::getField(string field, string &email) {
         size_t end = email.find("\r\n", pos);
         ret = email.substr(pos, end-pos);
     } else {
-        cerr << "Couldn't find '" << field << "' field in the email" << endl;
+        //cerr << "Couldn't find '" << field << "' field in the email" << endl;
     }
     return ret;
 }
@@ -76,40 +76,22 @@ string Email::removeWhiteSpaces(string text) {
     return text;
 }
 
-string Email::decode(string &text) {
-    std::string out;
-
-    std::vector<int> T(256,-1);
-    for (int i=0; i<64; i++) T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[i]] = i;
-
-    unsigned int val=0;
-    int valb=-8;
-    for (unsigned char c : text) {
-        if (T[c] == -1) break;
-        val = (val << 6) + T[c];
-        valb += 6;
-        if (valb >= 0) {
-            out.push_back(char((val>>valb)&0xFF));
-            valb -= 8;
-        }
-    }
-    return out;
-}
-
 void Email::parse(string email) {
     this->raw = email;
     this->subject = this->getField("Subject", email);
-    size_t pos = this->subject.find("-8?B?"); //it can be UTF-8?B? or utf-8?B?
+    size_t pos = this->subject.find("-8?B?"); //it can be UTF-8?B? or utf-8?B? (case sensitive)
     if (pos != string::npos) {
         //Email subject is base64 encoded
         pos = pos+5;
         string enc = this->subject.substr(pos, this->subject.length()-pos-2);
-        this->subject = this->decode(enc);
+        CryptoUtil cu;
+        this->subject = cu.base64_strdecode(enc);
     }
     this->from = this->getField("From", email);
     this->replyto = this->getField("Reply-To", email);
     this->returnpath = this->getField("Return-Path", email);
     pos = email.find("\r\n\r\n");
+    //Email format: HEADERS\r\nBODY+ATTACHMENTS
     if (pos != string::npos) {
         this->headers = email.substr(0, pos);
         this->body = email.substr(pos+4);
@@ -122,9 +104,14 @@ void Email::parse(string email) {
             this->body.erase(pos, 3);
             pos = this->body.find("=\r\n", pos);
         }
+        //Eventually decode base64 payload
+        if (this->getField("Content-Transfer-Encoding", this->headers) == "base64") {
+            CryptoUtil cu;
+            this->body = cu.base64_strdecode(this->body);
+        }
     } else {
         this->headers = email;
-        cerr << "Couldn't find body field in the email" << endl;
+        //cerr << "Couldn't find body field in the email" << endl;
     }
 }
 
