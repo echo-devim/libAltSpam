@@ -12,6 +12,7 @@
 #include "server.cpp"
 #include "imap/ImapClient.h"
 
+#define DEFAULT_MAIL_LIST 10
 
 string readFile(string path) {
     std::ifstream inFile(path);
@@ -82,7 +83,8 @@ int main(int argc, char *argv[]) {
     a.add<string>("remove-from-spam", 'r', "remove an email from spam dataset", false, "");
     a.add<string>("is-spam", 'i', "check if an email is spam or not", false, "");
     a.add<string>("spam-score", '\0', "get the spam score for the specified email", false, "");
-    a.add<int>("list", '\0', "get the latest n email and print their subject to stdout", false, 5);
+    a.add("list", '\0', "get the latest 10 email for each folder and print their subject to stdout");
+    a.add("list-score", '\0', "get the latest 10 email for each folder and print their scores to stdout");
     a.add<int>("monitor", 'm', "monitor the latest 10 email and move to junk spam emails each n minutes", false, 10);
     a.add<string>("spam-folder", '\0', "set spam folder name where to move spam messages", false, "JUNK");
     a.add<string>("imap-conf", '\0', "imap configuration file", false, "");
@@ -119,7 +121,7 @@ int main(int argc, char *argv[]) {
         }
     } else if (a.exist("list")) {
         ImapClient iclient(a.get<string>("imap-conf"));
-        vector<ImapMail> emails = iclient.getEmails(a.get<int>("list"));
+        vector<ImapMail> emails = iclient.getEmails(DEFAULT_MAIL_LIST);
         cout << "ID\tFOLDER\tSUBJECT" << endl;
         int i = 1;
         for (ImapMail mail : emails) {
@@ -127,12 +129,25 @@ int main(int argc, char *argv[]) {
             cout << i << "\t" << mail.folder << "\t" << em.subject << endl;
             i++;
         }
+    } else if (a.exist("list-score")) {
+        ImapClient iclient(a.get<string>("imap-conf"));
+        vector<ImapMail> emails = iclient.getEmails(DEFAULT_MAIL_LIST);
+        cout << "ID\tFOLDER\tSUBJECT\tSPAM\tSCORE" << endl;
+        int i = 1;
+        for (ImapMail mail : emails) {
+            EnrichedEmail em(mail.content);
+            cout << i << "\t" << mail.folder << "\t" << em.subject << "\t" << altspam.isSpam(em) << "\t" << altspam.getSpamScore(em) << endl;
+            i++;
+        }
     } else if (a.exist("spam-score")) {
         if (a.exist("imap-conf")) {
             ImapClient iclient(a.get<string>("imap-conf"));
-            vector<ImapMail> emails = iclient.getEmails(stoi(a.get<string>("spam-score")));
-            ImapMail lastmail = emails[emails.size()-1];
-            EnrichedEmail em(lastmail.content);
+            vector<ImapMail> emails = iclient.getEmails(DEFAULT_MAIL_LIST);
+            int index = stoi(a.get<string>("spam-score"))-1;
+            if (index < 0) index = 0;
+            else if (index > emails.size()) index = emails.size(); 
+            ImapMail mail = emails[index];
+            EnrichedEmail em(mail.content);
             cout << altspam.getSpamScore(em) << endl;
         } else {
             EnrichedEmail mail(readFile(a.get<string>("spam-score")));
@@ -141,9 +156,12 @@ int main(int argc, char *argv[]) {
     } else if (a.exist("is-spam")) {
         if (a.exist("imap-conf")) {
             ImapClient iclient(a.get<string>("imap-conf"));
-            vector<ImapMail> emails = iclient.getEmails(stoi(a.get<string>("is-spam")));
-            ImapMail lastmail = emails[emails.size()-1];
-            EnrichedEmail em(lastmail.content);
+            vector<ImapMail> emails = iclient.getEmails(DEFAULT_MAIL_LIST);
+            int index = stoi(a.get<string>("is-spam"))-1;
+            if (index < 0) index = 0;
+            else if (index > emails.size()) index = emails.size(); 
+            ImapMail mail = emails[index];
+            EnrichedEmail em(mail.content);
             cout << altspam.isSpam(em) << endl;
         } else {
             EnrichedEmail mail(readFile(a.get<string>("is-spam")));
@@ -152,9 +170,12 @@ int main(int argc, char *argv[]) {
     } else if (a.exist("remove-from-spam")) {
         if (a.exist("imap-conf")) {
             ImapClient iclient(a.get<string>("imap-conf"));
-            vector<ImapMail> emails = iclient.getEmails(stoi(a.get<string>("remove-from-spam")));
-            ImapMail lastmail = emails[emails.size()-1];
-            EnrichedEmail em(lastmail.content);
+            vector<ImapMail> emails = iclient.getEmails(DEFAULT_MAIL_LIST);
+            int index = stoi(a.get<string>("remove-from-spam"))-1;
+            if (index < 0) index = 0;
+            else if (index > emails.size()) index = emails.size(); 
+            ImapMail mail = emails[index];
+            EnrichedEmail em(mail.content);
             altspam.removeFromSpam(em);
         } else {
             EnrichedEmail mail(readFile(a.get<string>("remove-from-spam")));
@@ -164,9 +185,12 @@ int main(int argc, char *argv[]) {
     } else if (a.exist("add-to-spam")) {
         if (a.exist("imap-conf")) {
             ImapClient iclient(a.get<string>("imap-conf"));
-            vector<ImapMail> emails = iclient.getEmails(stoi(a.get<string>("add-to-spam")));
-            ImapMail lastmail = emails[emails.size()-1];
-            EnrichedEmail em(lastmail.content);
+            vector<ImapMail> emails = iclient.getEmails(DEFAULT_MAIL_LIST);
+            int index = stoi(a.get<string>("add-to-spam"))-1;
+            if (index < 0) index = 0;
+            else if (index > emails.size()) index = emails.size(); 
+            ImapMail mail = emails[index];
+            EnrichedEmail em(mail.content);
             altspam.addToSpam(em);
         } else {
             EnrichedEmail mail(readFile(a.get<string>("add-to-spam")));

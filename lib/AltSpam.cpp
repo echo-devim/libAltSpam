@@ -80,7 +80,6 @@ void AltSpam::removeFromSpam(EnrichedEmail &email) {
     if (this->debug) cout << email.subject << " marked as not spam" << endl;
     for (string word : email.getWords()) {
         if(this->word_count.find(word) != this->word_count.end()){
-            cout << word << " " << this->word_count[word] << endl;
             if (this->word_count[word] > 1) {
                 this->word_count[word]--;
             } else {
@@ -103,7 +102,10 @@ bool AltSpam::isSpam(EnrichedEmail &email) {
 
 float AltSpam::getSpamScore(EnrichedEmail &email) {
     float spam_score = 0;
-    if (this->debug) cout << "Calculating weighted words average based on word vector" << endl;
+    if (this->debug) {
+        cout << "Calculating score for " << email.subject << endl;
+        cout << "Calculating weighted words average based on word vector" << endl;
+    }
     // Calculate weighted words average based on our dataset
     float word_score = 0;
     vector<string> words = email.getWords();
