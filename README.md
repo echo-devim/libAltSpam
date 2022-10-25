@@ -87,9 +87,9 @@ Configure your IMAP connection using the interactive setup:
 $ ./altspam --init-imap
 ```
 
-This command will create a new file with connection properties such as (email, password, server, folders to monitor, etc.).
+This command will create a new file with connection properties such as (email, encrypted password, server, folders to monitor, etc.).
 
-List last 10 received emails for each folder and print their scores:
+List last 10 received unseen emails for each folder and print their scores:
 ```sh
 $ ./altspam --imap-conf conn.dat --list-score
 ```
@@ -109,10 +109,12 @@ For example let's add the test2 email to spam:
 ./altspam --imap-conf conn.dat -a 2
 ```
 
-You can monitor your inbox folders for spam messages each 10 minutes on a remote IMAP server with the following command:
+You can monitor your inbox folders for (unread) spam messages each 10 minutes on a remote IMAP server with the following command:
 ```sh
 $ ./altspam --imap-conf conn.dat --monitor 10
 ```
+
+Note: if you use 0 as value for `--monitor`, the application checks for spam messages only once and then it'll exit.
 
 Now, you are ready to easily create an antispam service in your system
 

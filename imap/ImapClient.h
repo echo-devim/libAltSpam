@@ -28,6 +28,8 @@ private:
     void init(string server, string username, string password);
     string fetchEmail(int id, string &folder);
     int getEmailCount(string &folder);
+    vector<int> getUnseenEmailsID(string &folder);
+    bool storeFlags(ImapMail mail, string flags, bool remove = false);
 
 public:
     vector<string> folders;
@@ -35,6 +37,8 @@ public:
     ImapClient(string server, string username, string password);
     ~ImapClient();
     vector<ImapMail> getEmails(int lastn);
+    vector<ImapMail> getUnseenEmails(int lastn);
     bool moveToFolder(ImapMail mail, string folderdest);
     bool deleteMail(ImapMail mail);
+    
 };
