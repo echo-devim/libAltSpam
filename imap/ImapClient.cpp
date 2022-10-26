@@ -133,9 +133,7 @@ vector<int> ImapClient::getUnseenEmailsID(string &folder) {
     string rep = temp_buf;
     temp_buf.clear();
     size_t pos = rep.find("SEARCH ");
-    if (pos == string::npos) {
-        cerr << "Cannot find search results for unseen emails. Response: " << rep << endl;
-    } else {
+    if (pos != string::npos) {
         rep = ' ' + rep.substr(pos+7);
         pos = rep.find_last_of(' ');
         while (pos != string::npos) {
